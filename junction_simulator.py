@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pprint
 import copy
 import random
 import math
@@ -241,8 +240,6 @@ class TrafficSimulator:
 				cycleDirectionOther1 = TrafficDirections.POSITION_LEFT
 				cycleDirectionOther2 = TrafficDirections.POSITION_RIGHT
 
-				#print('Zielone Góra i/lub Dół')
-
 			elif lightCycleCurrent < lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames: 																	# DeadTime #1
 
 				cycleMove = False
@@ -253,8 +250,6 @@ class TrafficSimulator:
 
 				cycleDirectionOther1 = TrafficDirections.POSITION_LEFT
 				cycleDirectionOther2 = TrafficDirections.POSITION_RIGHT
-
-				#print('DeadTime #1')
 
 			elif lightCycleCurrent < lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames + lightPlaneSimulationFrames[TrafficDirections.PLANE_LEFT_RIGHT]: 	# Zielone Lewo i/lub Prawo
 
@@ -267,8 +262,6 @@ class TrafficSimulator:
 				cycleDirectionOther1 = TrafficDirections.POSITION_UP
 				cycleDirectionOther2 = TrafficDirections.POSITION_DOWN
 
-				#print('Zielone Lewo i/lub Prawo')
-
 			else:																																											# DeadTime #2
 
 				cycleMove = False
@@ -280,21 +273,11 @@ class TrafficSimulator:
 				cycleDirectionOther1 = TrafficDirections.POSITION_UP
 				cycleDirectionOther2 = TrafficDirections.POSITION_DOWN
 
-				#print('DeadTime #2')
-
 			########################################################################
 			# Niezależnie od stanu świateł, samochody obecne na skrzyżowaniu,
 			# próbują je opuścic. Samochodów w drugim kierunku w ogóle nie powinno
 			# tu byc
 			########################################################################
-
-			#print('== LEAVE BEGIN ==')
-
-			#print(trafficQueues[cycleDirection1])
-			#print(trafficQueues[cycleDirection2])
-			#print ''
-			#print(trafficQueues[cycleDirectionOther1])
-			#print(trafficQueues[cycleDirectionOther2])
 
 			# Sprawdz, czy na skrzyżowaniu nie zostały samochody z poprzednich kierunków.
 			if (not trafficQueues[cycleDirectionOther1].postEmpty()) or (not trafficQueues[cycleDirectionOther2].postEmpty()):
@@ -334,26 +317,13 @@ class TrafficSimulator:
 			trafficQueues[cycleDirection1].tryPush(cycleMove and lightSimulationFrames[cycleDirection1] > lightCycleCurrentOffset)
 			trafficQueues[cycleDirection2].tryPush(cycleMove and lightSimulationFrames[cycleDirection2] > lightCycleCurrentOffset)
 
-			#print "cycleDirection1", cycleDirection1
-			#print "cycleDirection2", cycleDirection2
-
-			# print "lightCycleCurrentOffset", lightCycleCurrentOffset
-			# print "lightSimulationFrames[cycleDirection1]", lightSimulationFrames[cycleDirection1]
-			# print "lightSimulationFrames[cycleDirection2]", lightSimulationFrames[cycleDirection2]
-
-			#print(len(trafficQueues[cycleDirection1].queuePre))
-			#print(trafficQueues[cycleDirection1])
-			#print(trafficQueues[cycleDirection2])
-
-			#print('== LEAVE END ==')
-
 			########################################################################
 			# Generowanie nowych samochodów pojawiających się co ramkę
 			########################################################################
 			if(self.simulationFrame < self.simulationFrames):
 				for positionFrom in xrange(0, TrafficDirections.DIRECTIONS_COUNT):			# Dla każdego kierunku z
 					for positionTo in xrange(0, TrafficDirections.DIRECTIONS_COUNT):		# Dla każdego kierunku do
-						if(positionFrom != positionTo):									# Pominięcie przekątnej
+						if(positionFrom != positionTo):										# Pominięcie przekątnej
 							if(
 								trafficCarsPerSimulationMatrix[positionFrom][positionTo]	# Jeśli dostateczne prawdopodobieństwo pojawienia sie auta
 								>
@@ -361,7 +331,6 @@ class TrafficSimulator:
 							):
 								trafficCar = TrafficCar(self.simulationFrame, None, positionFrom, positionTo) # Stwórz auto
 								trafficQueues[positionFrom].append(trafficCar)
-								#print "Wygenerowany samochód: ", trafficCar
 
 			self.simulationFrame = self.simulationFrame + 1
 
