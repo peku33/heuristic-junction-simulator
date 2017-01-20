@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import copy
@@ -184,7 +185,7 @@ class TrafficSimulator:
 		assert(len(lightDutyCycles) == TrafficDirections.DIRECTIONS_COUNT)
 
 		lightSimulationFrames = TrafficDirections.DIRECTIONS_COUNT * [int]
-		for i in xrange(0, TrafficDirections.DIRECTIONS_COUNT):
+		for i in range(0, TrafficDirections.DIRECTIONS_COUNT):
 			assert(lightDutyCycles[i] < 1.0)
 			lightSimulationFrames[i] = int(math.floor(lightDutyCycles[i] * simulationFramesPerLightCycle))
 			assert(lightSimulationFrames[i] > 0)
@@ -321,8 +322,8 @@ class TrafficSimulator:
 			# Generowanie nowych samochodów pojawiających się co ramkę
 			########################################################################
 			if(self.simulationFrame < self.simulationFrames):
-				for positionFrom in xrange(0, TrafficDirections.DIRECTIONS_COUNT):			# Dla każdego kierunku z
-					for positionTo in xrange(0, TrafficDirections.DIRECTIONS_COUNT):		# Dla każdego kierunku do
+				for positionFrom in range(0, TrafficDirections.DIRECTIONS_COUNT):			# Dla każdego kierunku z
+					for positionTo in range(0, TrafficDirections.DIRECTIONS_COUNT):		# Dla każdego kierunku do
 						if(positionFrom != positionTo):										# Pominięcie przekątnej
 							if(
 								trafficCarsPerSimulationMatrix[positionFrom][positionTo]	# Jeśli dostateczne prawdopodobieństwo pojawienia sie auta
