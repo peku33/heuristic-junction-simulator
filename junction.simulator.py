@@ -188,6 +188,7 @@ class TrafficSimulator:
 		for i in xrange(0, TrafficDirections.DIRECTIONS_COUNT):
 			assert(lightDutyCycles[i] < 1.0)
 			lightSimulationFrames[i] = int(math.floor(lightDutyCycles[i] * simulationFramesPerLightCycle))
+			assert(lightSimulationFrames[i] > 0)
 
 		# Liczba cykli zielonego w każdej płaszczyźnie
 		lightPlaneSimulationFrames = TrafficDirections.PLANES_COUNT * [int]
@@ -245,7 +246,7 @@ class TrafficSimulator:
 			elif lightCycleCurrent < lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames: 																	# DeadTime #1
 
 				cycleMove = False
-				lightCycleCurrentOffset = lightCycleCurrent - lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN]
+				lightCycleCurrentOffset = lightCycleCurrent - (lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN])
 
 				cycleDirection1 = TrafficDirections.POSITION_UP
 				cycleDirection2 = TrafficDirections.POSITION_DOWN
@@ -258,7 +259,7 @@ class TrafficSimulator:
 			elif lightCycleCurrent < lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames + lightPlaneSimulationFrames[TrafficDirections.PLANE_LEFT_RIGHT]: 	# Zielone Lewo i/lub Prawo
 
 				cycleMove = True
-				lightCycleCurrentOffset = lightCycleCurrent - lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames
+				lightCycleCurrentOffset = lightCycleCurrent - (lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames)
 
 				cycleDirection1 = TrafficDirections.POSITION_LEFT
 				cycleDirection2 = TrafficDirections.POSITION_RIGHT
@@ -271,7 +272,7 @@ class TrafficSimulator:
 			else:																																											# DeadTime #2
 
 				cycleMove = False
-				lightCycleCurrentOffset = lightCycleCurrent - lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames + lightPlaneSimulationFrames[TrafficDirections.PLANE_LEFT_RIGHT]
+				lightCycleCurrentOffset = lightCycleCurrent - (lightPlaneSimulationFrames[TrafficDirections.PLANE_UP_DOWN] + lightDeadTimeFrames + lightPlaneSimulationFrames[TrafficDirections.PLANE_LEFT_RIGHT])
 
 				cycleDirection1 = TrafficDirections.POSITION_LEFT
 				cycleDirection2 = TrafficDirections.POSITION_RIGHT
@@ -328,10 +329,19 @@ class TrafficSimulator:
 					self.removedCars.append(carMoved)
 
 
-			# Jeśli zwolniło się miejsce - przesuń auta do przodu
-			trafficQueues[cycleDirection2].tryPush(cycleMove)
-			trafficQueues[cycleDirection1].tryPush(cycleMove)
+			# Przesuń auta w kolejce.
+			# Dodaj te z tyłu, jeśli jest zielone światło
+			trafficQueues[cycleDirection1].tryPush(cycleMove and lightSimulationFrames[cycleDirection1] > lightCycleCurrentOffset)
+			trafficQueues[cycleDirection2].tryPush(cycleMove and lightSimulationFrames[cycleDirection2] > lightCycleCurrentOffset)
 
+			#print "cycleDirection1", cycleDirection1
+			#print "cycleDirection2", cycleDirection2
+
+			# print "lightCycleCurrentOffset", lightCycleCurrentOffset
+			# print "lightSimulationFrames[cycleDirection1]", lightSimulationFrames[cycleDirection1]
+			# print "lightSimulationFrames[cycleDirection2]", lightSimulationFrames[cycleDirection2]
+
+			#print(len(trafficQueues[cycleDirection1].queuePre))
 			#print(trafficQueues[cycleDirection1])
 			#print(trafficQueues[cycleDirection2])
 
@@ -378,14 +388,23 @@ class TrafficSimulator:
 		return self.simulationFrame - self.simulationFrames
 
 
-
-trafficCarsPerSimulationMatrix = [
-	[0, 500, 500, 500],
-	[500, 0, 500, 500],
-	[500, 500, 0, 500],
-	[500, 500, 500, 0],
-]
-ts = TrafficSimulator(trafficCarsPerSimulationMatrix, 100, 5, 100, [0.4, 0.4, 0.4, 0.40])
-print(ts.calculateSumWaitTime())
-print(ts.calculateMaxWaitTime())
-print(ts.getFramesOverrun())
+# Przykładowe użycie
+#
+# 1. 1440 samochodów z każdego kierunku w każdy
+#
+# trafficCarsPerSimulationMatrix = [
+# 	[0, 1440, 1440, 1440],
+# 	[1440, 0, 1440, 1440],
+# 	[1440, 1440, 0, 1440],
+# 	[1440, 1440, 1440, 0],
+# ]
+# 
+# -> Na skrzyżowaniu mieszcza się 3 samochody => opuszczenie skrzyżowania zajmuje 3 ramki
+# -> Samochód opuszcza skrzyżowanie w 3 sekundy. 3 sekund = 3 ramek => 1 ramka = 1 sekunda
+# -> Cykl świateł na skrzyżowaniu trwa 60 sekund. 2x2x3 sekundy to czas martwy = 12 sekund = 20% calosci czasu. Z tego wynika, że maksymalny duty cycle, w którąkolwiek stronę wynosi 0.80
+# -> Sumulujemy 4 godziny. W tym czasie nastąpi 60 * 4 pełnych cykli
+# 
+# ts = TrafficSimulator(trafficCarsPerSimulationMatrix, 60 * 4, 3, 60, [0.4, 0.4, 0.4, 0.4])
+# print(ts.calculateSumWaitTime())
+# print(ts.calculateMaxWaitTime())
+# print(ts.getFramesOverrun())
