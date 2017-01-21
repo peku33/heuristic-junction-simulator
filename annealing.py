@@ -29,7 +29,7 @@ class TrafficAnnealer(Annealer):
         except KeyboardInterrupt as e:
             raise e
         except:
-            return math.inf
+            return float("inf")
 
 
 def main(argv=None):
