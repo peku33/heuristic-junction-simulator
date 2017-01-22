@@ -31,18 +31,14 @@ class TrafficAnnealer(Annealer):
         except:
             return float("inf")
 
-
-def main(argv=None):
-    traffic_cars_per_simulation_matrix = [
-	    [0, 1440, 1440, 1440],
-	    [1440, 0, 1440, 1440],
-	    [1440, 1440, 0, 1440],
-	    [1440, 1440, 1440, 0],
-    ]
+def run_test(matrix):
+    import pprint
+    pp = pprint.PrettyPrinter()
+    pp.pprint(matrix)
     traffic_annealer = TrafficAnnealer(
         [0.2, 0.2, 0.2, 0.2],
         args=[
-            traffic_cars_per_simulation_matrix,
+            matrix,
             60 * 4,
             3,
             60,
@@ -51,6 +47,36 @@ def main(argv=None):
     x, y = traffic_annealer.anneal()
     print(x, y)
 
+def main(argv=None):
+    max_traffic = 1440
+    traffic_matrix = [
+        [
+	        [0, 0.75 * max_traffic, 1.00 * max_traffic, 0.50 * max_traffic],
+	        [0.75 * max_traffic, 0, 1.00 * max_traffic, 0.50 * max_traffic],
+	        [0.25 * max_traffic, 0.25 * max_traffic, 0, 0.25 * max_traffic],
+	        [0.25 * max_traffic, 0.25 * max_traffic, 0.50 * max_traffic, 0],
+        ],
+        [
+	        [0, 0.50 * max_traffic, 0.25 * max_traffic, 0.25 * max_traffic],
+	        [0.50 * max_traffic, 0, 0.50 * max_traffic, 0.25 * max_traffic],
+	        [0.25 * max_traffic, 0.50 * max_traffic, 0, 0.25 * max_traffic],
+	        [0.25 * max_traffic, 0.25 * max_traffic, 0.25 * max_traffic, 0],
+        ],
+        [
+	        [0, 0.75 * max_traffic, 0.25 * max_traffic, 0.25 * max_traffic],
+	        [0.75 * max_traffic, 0, 0.25 * max_traffic, 0.25 * max_traffic],
+	        [1.00 * max_traffic, 1.00 * max_traffic, 0, 0.50 * max_traffic],
+	        [0.50 * max_traffic, 0.50 * max_traffic, 0.25 * max_traffic, 0],
+        ],
+        [
+	        [0, 0.25 * max_traffic, 0.05 * max_traffic, 0.05 * max_traffic],
+	        [0.25 * max_traffic, 0, 0.05 * max_traffic, 0.05 * max_traffic],
+	        [0.05 * max_traffic, 0.05 * max_traffic, 0, 0.05 * max_traffic],
+	        [0.05 * max_traffic, 0.05 * max_traffic, 0.05 * max_traffic, 0],
+        ],
+    ]
+    for m in traffic_matrix:
+        run_test(m)
 
 if __name__ == '__main__':
     from sys import argv
